@@ -1,0 +1,309 @@
+{
+	"info": {
+		"_postman_id": "6635bb02-1db0-4f4f-991d-f737954940a1",
+		"name": "Marcus Proj",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Register",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"firstName\": \"Marcus\",\n    \"lastName\": \"Hindsbøl\",\n    \"age\": 23,\n    \"email\": \"marcushindsboel@gmail.com\",\n    \"password\": \"zlatan123\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:3000/users/register",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"users",
+						"register"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Login",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:3000/users/login?email=marcushindsboel@gmail.com&password=zlatan123",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"users",
+						"login"
+					],
+					"query": [
+						{
+							"key": "email",
+							"value": "marcushindsboel@gmail.com"
+						},
+						{
+							"key": "password",
+							"value": "zlatan123"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get All",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImNaQ0Jxb0wyOWlKZXlIYTMzYVNWRCIsImlhdCI6MTYxMjg0NzU1MH0.X9lEuW7MOyRTAZADAjus7PsjMwA7DLXhxlC4J5gIQ2k",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:3000/users/",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"users",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get My User",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6InZlTDhQdWRsMTFPZm54dmxBWlMzZCIsImlhdCI6MTYxMjg4MTcxOX0.XuqPU1nSvhCZMADJqwn72dsjv6jZkRFRf5-gTqGKfq0",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:3000/users/info",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"users",
+						"info"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete My User",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImNaQ0Jxb0wyOWlKZXlIYTMzYVNWRCIsImlhdCI6MTYxMjg0NzU1MH0.X9lEuW7MOyRTAZADAjus7PsjMwA7DLXhxlC4J5gIQ2k",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "localhost:3000/users/",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"users",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Random User",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6InZlTDhQdWRsMTFPZm54dmxBWlMzZCIsImlhdCI6MTYxMjg4MTcxOX0.XuqPU1nSvhCZMADJqwn72dsjv6jZkRFRf5-gTqGKfq0",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:3000/users/random",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"users",
+						"random"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Send Like",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6InZlTDhQdWRsMTFPZm54dmxBWlMzZCIsImlhdCI6MTYxMjg4MTcxOX0.XuqPU1nSvhCZMADJqwn72dsjv6jZkRFRf5-gTqGKfq0",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"likedId\": \"c81sQI3QYfTxKo93jVaEI\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:3000/matches/send-like",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"matches",
+						"send-like"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Send Dislike",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImNaQ0Jxb0wyOWlKZXlIYTMzYVNWRCIsImlhdCI6MTYxMjg0NzU1MH0.X9lEuW7MOyRTAZADAjus7PsjMwA7DLXhxlC4J5gIQ2k",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"likedId\": \"c81sQI3QYfTxKo93jVaEI\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:3000/matches/send-dislike",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"matches",
+						"send-dislike"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get My Matches",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6InZlTDhQdWRsMTFPZm54dmxBWlMzZCIsImlhdCI6MTYxMjg4MTcxOX0.XuqPU1nSvhCZMADJqwn72dsjv6jZkRFRf5-gTqGKfq0",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:3000/matches/",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"matches",
+						""
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
