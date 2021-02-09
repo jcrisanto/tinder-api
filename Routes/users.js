@@ -2,10 +2,12 @@ const fs = require('fs');
 const express = require("express");
 const router = express.Router();
 const user = require("../Models/user.js");
-const { request } = require('http');
+const bcrypt = require("bcrypt");
+const auth = require('../Services/auth');
 
 let usersTable = [];
 loadChanges();
+
 router.post('/register', function (req,res){ 
     let firstName = req.body.firstName;
     let lastName = req.body.lastName;
@@ -20,18 +22,23 @@ router.post('/register', function (req,res){
     }
     usersTable.push(newUser);
     saveChanges();
-    res.status(201).json(newUser);
+    const userDto = {...newUser};
+    userDto.password = "n/a";
+    res.status(201).json(userDto);
 });
 
 router.get('/login', function (req, res) {
     const email = req.query.email;
     const password = req.query.password;
-    const user = usersTable.find((u) => u.email === email && u.password === password);
+    const user = usersTable.find((u) => u.email === email && bcrypt.compareSync(password, u.password));
+        /*const user = usersTable.find((u) => 'jcrisanto0@gmail.com' === 'jcrisanto0@gmail.com' && bcrypt.compareSync('jorge123', 
+    '$2b$05$JfGEAY6t6usnnMGS/7H7cOoMyOBsb/hD3oNm.ue5jrgZC07bowMOu')); */
     if (!user) {
         res.status(400).send("Incorrect username or password!");
         return;
     }
-    res.status(200).send("You are logged in now!");
+    const token = auth.generateToken({id: user.id});
+    res.status(200).send(token);
 });
 
 router.get("/", function (req, res) {
@@ -40,21 +47,21 @@ router.get("/", function (req, res) {
     res.status(200).send(usersTable);
 });
 
-router.get("/:id", function (req, res) {
-    const foundUser = usersTable.find((u) => u.id === req.params.id);
+router.get("/info", function (req, res) {
+    const foundUser = usersTable.find((u) => u.id === req.userId);
     if  (foundUser) {
         let userDTO = {...foundUser};
         userDTO.password = "n/a";
         res.status(200).send(userDTO);
         return;
     }
-    res.status(400).send("User was not found");
+    res.status(401).send("Unauthorized");
 });
 
-router.delete("/:id", function (req, res) {
-    const foundIndex = usersTable.findIndex((u) => u.id === req.params.id);
+router.delete("/", function (req, res) {
+    const foundIndex = usersTable.findIndex((u) => u.id === req.userId);
     if (foundIndex === -1) {
-        res.status(400).send("User was not found");
+        res.status(401).send("Unauthorized");
         return;
     }
     usersTable.splice(foundIndex, 1);
@@ -72,16 +79,36 @@ router.put("/", function (req, res) {
         return;
     }
     res.status(400).send("User was not found");
-    console.log(req.body);
+});
+
+router.get("/random", (req, res) => {
+    const foundUsers = usersTable.filter(u => u.id !== req.userId);
+    if(foundUsers.length === 0) {
+        res.status(400).send("No match was found");
+        return;
+    }
+    const selectedUser = foundUsers[Math.floor(Math.random() * foundUsers.length)];
+    let userDTO = {...selectedUser};
+    usersDTO.password = "n/a";
+    res.status(200).send(userDTO);
 });
 
 function saveChanges() {
+    const fileExists = fs.existsSync("Database");
+    if(!fileExists) {
+        fs.mkdirSync("Database");
+    }
     fs.writeFile("Database/users-table.json", JSON.stringify(usersTable, null, 2), (err) => { console.log(err) });
 }
 
 function loadChanges() {
+    const fileExists = fs.existsSync("Database/users-table.json");
+    if(!fileExists) {
+        usersTable = [];
+        return;
+    }
     const data = fs.readFileSync("Database/users-table.json");
-    usersTable = [...JSON.parse(data)];
+    usersTable = [...JSON.parse(data.toString())];
 }
 
 module.exports = router;
