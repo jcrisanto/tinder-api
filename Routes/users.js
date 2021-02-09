@@ -89,7 +89,7 @@ router.get("/random", (req, res) => {
     }
     const selectedUser = foundUsers[Math.floor(Math.random() * foundUsers.length)];
     let userDTO = {...selectedUser};
-    usersDTO.password = "n/a";
+    userDTO.password = "n/a";
     res.status(200).send(userDTO);
 });
 
