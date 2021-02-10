@@ -118,4 +118,17 @@ function loadChanges() {
     usersTable = [...JSON.parse(data.toString())];
 }
 
+exports.getRandomUser = (reqUserId = "0", users = []) => {
+    const foundUsers = users.filter(u => u.id !== reqUserId);
+    if(foundUsers.length === 0) {
+        return null;
+    }
+    const selectedUser = foundUsers[Math.floor(Math.random() * foundUsers.length)];
+    let userDTO = {...selectedUser};
+    userDTO.password = "n/a";
+    return userDTO;
+};
+
+module.exports = getRandomUser;
+
 module.exports = router;
