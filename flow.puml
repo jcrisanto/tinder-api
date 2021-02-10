@@ -1,0 +1,19 @@
+@startuml DataFlowDiagram
+
+UserWithCorrectCredentials -> Server: Authentication Request
+
+Server -> UserWithCorrectCredentials: sends a token to the user
+
+UserWithInvalidCredentials -> Server: Authentication Request
+
+Server -> UserWithInvalidCredentials: sends an unauthorized response
+
+AuthenticatedUser -> Server: user with valid token sends arequest the server
+
+Server -> AuthenticatedUser: the server process the request
+
+UnauthenticatedUser -> Server: user with invalid or no sends a request the server
+
+Server -> UnauthenticatedUser: the server throws an error
+
+@enduml
