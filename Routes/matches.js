@@ -13,7 +13,7 @@ router.put('/send-like', (req, res) => {
 
     const foundMatch = matches.find((m) => m.exists(sendingLikeId, recievingLikeId));
     if(foundMatch) {
-        res.status(200).send();
+        res.status(204).send();
         return;
     }
 
@@ -21,12 +21,12 @@ router.put('/send-like', (req, res) => {
     if (isMatchIndex === -1) {
         const foundMatchRequest = matchRequests.find((m) => m.exists(sendingLikeId, recievingLikeId));
         if(foundMatchRequest) {
-            res.status(200).send();
+            res.status(204).send();
             return;
         }
         matchRequests.push(new match(sendingLikeId, recievingLikeId));
         saveChanges();
-        res.status(200).send();
+        res.status(204).send();
         return;
     }
     matchRequests.splice(isMatchIndex, 1);
@@ -98,6 +98,6 @@ function loadChanges() {
 }
 
 function mapMatch({sendingLikeId, recievingLikeId}) {return new match(sendingLikeId, recievingLikeId)}
-function mapUserDto({firstName, lastName, age, email}) {return {firstName, lastName, age, email}}
+function mapUserDto({id, firstName, lastName, age, email}) {return {id, firstName, lastName, age, email}}
 
 module.exports = router;

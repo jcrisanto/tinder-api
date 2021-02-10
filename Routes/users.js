@@ -71,8 +71,15 @@ router.delete("/", function (req, res) {
 
 router.put("/", function (req, res) {
     const userFromRequest = req.body;
-    let foundIndex = usersTable.findIndex((u) => u.id === userFromRequest.id);
+    let foundIndex = usersTable.findIndex((u) => u.id === req.userId);
+    let anotherUserWithSameEmail = usersTable.find((u) => u.id !== req.userId && u.email === userFromRequest.email);
+    if(anotherUserWithSameEmail) {
+        res.status(400).send('Email already taken, please use another email');
+        return;
+    }
     if (foundIndex !== -1) {
+        userFromRequest.id = req.userId;
+        userFromRequest.password = usersTable[foundIndex].password;
      usersTable[foundIndex] = userFromRequest;
         saveChanges();
         res.status(200).send("User was updated");

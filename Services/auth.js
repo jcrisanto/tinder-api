@@ -9,14 +9,14 @@ exports.authorize = (req, res, next) => {
     }
 
     if(!req.headers.authorization){
-        res.status(401).send('Unauthorized');
+        res.status(401).send({error: 'Unauthorized'});
         return;
     }
 
     const token = req.headers.authorization.replace('Bearer ', '');
     verify(token, 'm-a-r-c-u-s-0-0', function(err, decoded) {
         if(err) {
-            res.status(401).send('Unauthorized');
+            res.status(401).send({error: 'Unauthorized'});
             return;
         }
         req.userId = decoded.id;
