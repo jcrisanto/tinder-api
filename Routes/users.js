@@ -89,14 +89,11 @@ router.put("/", function (req, res) {
 });
 
 router.get("/random", (req, res) => {
-    const foundUsers = usersTable.filter(u => u.id !== req.userId);
-    if(foundUsers.length === 0) {
+    const userDTO = getRandomUser(req.userId, usersTable);
+    if(!userDTO) {
         res.status(400).send("No match was found");
         return;
     }
-    const selectedUser = foundUsers[Math.floor(Math.random() * foundUsers.length)];
-    let userDTO = {...selectedUser};
-    userDTO.password = "n/a";
     res.status(200).send(userDTO);
 });
 
@@ -118,7 +115,7 @@ function loadChanges() {
     usersTable = [...JSON.parse(data.toString())];
 }
 
-exports.getRandomUser = (reqUserId = "0", users = []) => {
+const getRandomUser = (reqUserId = "0", users = []) => {
     const foundUsers = users.filter(u => u.id !== reqUserId);
     if(foundUsers.length === 0) {
         return null;
@@ -129,6 +126,5 @@ exports.getRandomUser = (reqUserId = "0", users = []) => {
     return userDTO;
 };
 
-module.exports = getRandomUser;
-
-module.exports = router;
+const userRouter = router;
+module.exports = {getRandomUser, userRouter};
