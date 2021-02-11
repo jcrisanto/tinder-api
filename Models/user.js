@@ -14,4 +14,20 @@ class user {
     
 }
 
+//Use of inheritence
+class paidUser extends user {
+    constructor (firstName, lastName, age, email, password, creditCard = 0, subscriptionType = 'MONTHLY') {
+       super(firstName, lastName, age, email, password);
+       this.creditCard = creditCard;
+       this.subscriptionType = subscriptionType;
+    }
+    paySubscription(creditCard){
+        if(this.subscriptionType === 'MONTHLY'){
+            //send payment to system for $5
+        }else if (this.subscriptionType === 'YEARLY'){
+            //send payment to system for $60
+        }
+    }
+}
+
 module.exports = user;
