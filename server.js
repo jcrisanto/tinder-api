@@ -4,7 +4,8 @@ const cors = require("cors");
 const {userRouter} = require("./Routes/users.js");
 const matchRouter = require("./Routes/matches.js")
 const auth = require("./Services/auth");
-const app = express();
+const asyncify = require('express-asyncify');
+const app = asyncify(express());
 app.use(express.json());
 app.use(cors());
 //authorize is used a middleware
