@@ -3,7 +3,7 @@
     "authentication": {
         "type": "default",
         "options": {
-            "username": "marcussh",
+            "userName": "marcussh",
             "password": "Sangill2312"
         }
     },

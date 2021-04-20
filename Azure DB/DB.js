@@ -1,5 +1,6 @@
 const { Connection, Request, TYPES} = require('tedious');
 const config = require('./config.json')
+const User = require('../Models/user')
 
 var connection = new Connection(config)
 
@@ -19,6 +20,8 @@ function startDb(){
     })
 }
 
+startDb();
+
 function selectUserById(id){
     return new Promise((resolve, reject) => {
         const sql = 'SELECT users_id FROM [users].[id] WHERE id = @id'
@@ -35,7 +38,7 @@ function selectUserById(id){
         request.on('row', (columns) =>{
             resolve(columns)
         });
-    })
+    });
 }
 
 module.exports.selectUserById = selectUserById;
@@ -46,18 +49,28 @@ function selectUserByEmail(email){
         const sql = 'SELECT * FROM [tinderUsers].[users] WHERE email = @email'
         const request = new Request(sql, (err, rowcount) => {
             if (err){
-                reject(err)
-                console.log(err)
+                reject(err);
+                console.log(err);
             } else if (rowcount == 0) {
-                reject({message: 'User does not exist'})
+                console.log("User does not exist");
+                resolve(null);
             }
         });
-        request.addParameter('email', TYPES.int, email);
+        request.addParameter('email', TYPES.VarChar, email);
 
-        request.on('row', (columns) =>{
-            resolve(columns)
+        request.on('row', (columns) => {
+
+            var rowObject = {};
+                columns.forEach(function(column) {
+                    rowObject[column.metadata.colName] = column.value;
+                });
+
+                const user = User.fromDB(rowObject.id, rowObject.firstName, rowObject.lastName, rowObject.age, rowObject.gender, rowObject.email, rowObject.password);
+                console.log(user)
+            resolve(user);
         });
-    })
+        connection.execSql(request);
+    });
 }
 
 exports.selectUserByEmail = selectUserByEmail;
@@ -65,16 +78,20 @@ exports.selectUserByEmail = selectUserByEmail;
 
 function insertUser(user){
     return new Promise((resolve, reject) => {
-        const sql = 'INSERT INTO [users].[users] (firstName, lastName, email, gender) VALUES (@name, @email, @gender)'
+        const sql = 'INSERT INTO [tinderUsers].[users] (id, firstName, lastName, age, gender, email, password) VALUES (@id, @firstName, @lastName, @age, @gender, @email, @password)'
         const request = new Request(sql, (err) => {
             if (err){
                 reject(err)
                 console.log(err)
             }
         });
-        request.addParameter('name', TYPES.VarChar, user.name)
-        request.addParameter('email', TYPES.VarChar, user.email)
+        request.addParameter('id', TYPES.VarChar, user.id)
+        request.addParameter('firstName', TYPES.VarChar, user.firstName)
+        request.addParameter('lastName', TYPES.VarChar, user.lastName)
+        request.addParameter('age', TYPES.Int, user.age)
         request.addParameter('gender', TYPES.VarChar, user.gender)
+        request.addParameter('email', TYPES.VarChar, user.email)
+        request.addParameter('password', TYPES.Text, user.password)
 
         request.on('requestCompleted', (row) => {
             console.log('User inserted', row);

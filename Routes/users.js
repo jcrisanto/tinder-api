@@ -2,7 +2,7 @@ const fs = require('fs');
 const express = require("express");
 const asyncify = require('express-asyncify');
 const router = asyncify(express.Router());
-const user = require("../Models/user.js");
+const User = require("../Models/user.js");
 const bcrypt = require("bcrypt");
 const auth = require('../Services/auth');
 const DB = require('../Azure DB/DB');
@@ -15,9 +15,10 @@ router.post('/register', async (req,res) => {
     let firstName = req.body.firstName;
     let lastName = req.body.lastName;
     let age = parseInt(req.body.age);
+    let gender = req.body.gender;
     let email = req.body.email;
     let password = req.body.password;
-    let newUser = new user(firstName, lastName, age, email, password);
+    let newUser = new User(firstName, lastName, age, gender, email, password);
 
     const foundUser = await DB.selectUserByEmail(newUser.email);
 
@@ -25,6 +26,7 @@ router.post('/register', async (req,res) => {
         res.status(400).send("Email already in use, try with a different email");
         return;
     }
+    const pushUser = await DB.insertUser(newUser);
     const userDto = {...newUser};
     userDto.password = "n/a";
     res.status(201).json(userDto);

@@ -2,20 +2,28 @@
 const { nanoid } = require("nanoid");
 //bcrypt is a library for encrypting plain text, it's used to hash passwords
 const bcrypt = require('bcrypt');
-class user {
-    constructor (firstName, lastName, age, email, password) {
+class User {
+    constructor (firstName, lastName, age, gender, email, password) {
         this.id = nanoid();
         this.firstName = firstName;
         this.lastName = lastName;
         this.age = age;
+        this.gender = gender;
         this.email = email;
         this.password = bcrypt.hashSync(password, 5);
     }
-    
+
+    static fromDB(id, firstName, lastName, age, gender, email, password) {
+        let user = new User(firstName, lastName, age, gender, email, password);
+
+        user.id = id;
+        user.password = password;
+        return user;
+    }
 }
 
 //Use of inheritence
-class paidUser extends user {
+class paidUser extends User {
     constructor (firstName, lastName, age, email, password, creditCard = 0, subscriptionType = 'MONTHLY') {
        super(firstName, lastName, age, email, password);
        this.creditCard = creditCard;
@@ -30,4 +38,4 @@ class paidUser extends user {
     }
 }
 
-module.exports = user;
+module.exports = User;
