@@ -75,10 +75,11 @@ router.delete("/", async (req, res) => {
     if(!foundUser) {
         res.status(401).send({error: 'Unauthorized'});
         return;
-    }
-    usersTable.splice(foundIndex, 1);
+    } else {
+    usersTable.splice(foundUser, 1);
     saveChanges();
     res.status(200).send("User was deleted");
+    }
 });
 
 router.put("/", function (req, res) {

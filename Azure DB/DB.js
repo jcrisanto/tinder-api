@@ -152,12 +152,8 @@ function deleteUser(id){
         });
         request.addParameter('id', TYPES.VarChar, id);
         
-        request.on('done', (columns) => {
-
-            var rowObject = {};
-                columns.forEach(function(column) {
-                    rowObject[column.metadata.colName] = column.value;
-                });
+        request.on('done', function(rowCount) {
+                console.log(rowCount + ' rows returned');
 
                 const user = User.fromDB(rowObject.id, rowObject.firstName, rowObject.lastName, rowObject.age, rowObject.gender, rowObject.email, rowObject.password);
                 resolve(user);
