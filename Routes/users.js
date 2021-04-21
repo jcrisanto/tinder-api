@@ -28,45 +28,52 @@ router.post('/register', async (req,res) => {
     }
     const pushUser = await DB.insertUser(newUser);
     const userDto = {...newUser};
-    userDto.password = "n/a";
+    delete userDto.password;
     res.status(201).json(userDto);
 });
 
-router.get('/login', function (req, res) {
+router.get('/login', async (req, res) => {
     const email = req.query.email;
     const password = req.query.password;
-    const user = usersTable.find((u) => u.email === email && bcrypt.compareSync(password, u.password));
-        /*const user = usersTable.find((u) => 'marcushindsboel@gmail.com' === 'marcushindsboel@gmail.com' && bcrypt.compareSync('marcus123', 
-    '$2b$05$JfGEAY6t6usnnMGS/7H7cOoMyOBsb/hD3oNm.ue5jrgZC07bowMOu')); */
+    const user = await DB.selectUserByEmail(email);
     if (!user) {
         res.status(400).send("Incorrect username or password!");
+        return;
+    }
+    const passwordIsCorrect = bcrypt.compareSync(password, user.password);
+    if (!passwordIsCorrect) {
+        res.status(400).send("Incorrect username or password");
         return;
     }
     const token = auth.generateToken({id: user.id});
     res.status(200).send(token);
 });
 
-router.get("/", function (req, res) {
-    const usersDTO = [...usersTable];
-    usersDTO.forEach((u) => u.password = "n/a");
-    res.status(200).send(usersTable);
-});
-
-router.get("/info", function (req, res) {
-    const foundUser = usersTable.find((u) => u.id === req.userId);
-    if  (foundUser) {
-        let userDTO = {...foundUser};
-        userDTO.password = "n/a";
-        res.status(200).send(userDTO);
+router.get("/", async (req, res) => {
+    const foundUser = await DB.selectUserById(req.userId);
+    if(!foundUser) {
+        res.status(401).send({error: 'Unauthorized'});
         return;
     }
-    res.status(401).send("Unauthorized");
+    const usersDTO = await DB.getAllUsers();
+    usersDTO.forEach((u) => delete u.password);
+    res.status(200).send(usersDTO);
 });
 
-router.delete("/", function (req, res) {
-    const foundIndex = usersTable.findIndex((u) => u.id === req.userId);
-    if (foundIndex === -1) {
-        res.status(401).send("Unauthorized");
+router.get("/info", async (req, res) => {
+    const foundUser = await DB.selectUserById(req.userId);
+    if(!foundUser) {
+        res.status(401).send({error: 'Unauthorized'});
+        return;
+    }
+    delete foundUser.password;
+    res.status(200).send(foundUser);
+});
+
+router.delete("/", async (req, res) => {
+    const foundUser = await DB.selectUserById(req.userId);
+    if(!foundUser) {
+        res.status(401).send({error: 'Unauthorized'});
         return;
     }
     usersTable.splice(foundIndex, 1);

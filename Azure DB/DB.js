@@ -24,20 +24,28 @@ startDb();
 
 function selectUserById(id){
     return new Promise((resolve, reject) => {
-        const sql = 'SELECT users_id FROM [users].[id] WHERE id = @id'
+        const sql = 'SELECT * FROM [tinderUsers].[users] WHERE id = @id'
         const request = new Request(sql, (err, rowcount) => {
             if (err){
-                reject(err)
-                console.log(err)
+                reject(err);
+                console.log(err);
             } else if (rowcount == 0) {
-                reject({message: 'User does not exist'})
+                resolve(null);
             }
         });
-        request.addParameter('id', TYPES.int, id);
+        request.addParameter('id', TYPES.VarChar, id);
+        
+        request.on('row', (columns) => {
 
-        request.on('row', (columns) =>{
-            resolve(columns)
+            var rowObject = {};
+                columns.forEach(function(column) {
+                    rowObject[column.metadata.colName] = column.value;
+                });
+
+                const user = User.fromDB(rowObject.id, rowObject.firstName, rowObject.lastName, rowObject.age, rowObject.gender, rowObject.email, rowObject.password);
+                resolve(user);
         });
+        connection.execSql(request);
     });
 }
 
@@ -52,7 +60,6 @@ function selectUserByEmail(email){
                 reject(err);
                 console.log(err);
             } else if (rowcount == 0) {
-                console.log("User does not exist");
                 resolve(null);
             }
         });
@@ -93,11 +100,70 @@ function insertUser(user){
         request.addParameter('email', TYPES.VarChar, user.email)
         request.addParameter('password', TYPES.Text, user.password)
 
-        request.on('requestCompleted', (row) => {
-            console.log('User inserted', row);
-            resolve('user inserted', row)
+        request.on('requestCompleted', () => {
+            resolve('User inserted');
         });
-        connection.execSql(request)
+        connection.execSql(request);
     });
 }
 module.exports.insertUser = insertUser;
+
+
+function getAllUsers(){
+    return new Promise((resolve, reject) => {
+        const sql = 'SELECT * FROM [tinderUsers].[users]'
+        const request = new Request(sql, (err, rowcount) => {
+            if (err){
+                reject(err);
+                console.log(err);
+            } else if (rowcount == 0) {
+                resolve([]);
+            }
+        });
+        const users = [];
+        request.on('row', (columns) => {
+            var rowObject = {};
+                columns.forEach(function(column) {
+                    rowObject[column.metadata.colName] = column.value;
+                });
+
+                const user = User.fromDB(rowObject.id, rowObject.firstName, rowObject.lastName, rowObject.age, rowObject.gender, rowObject.email, rowObject.password);
+                users.push(user);
+        });
+        request.on('requestCompleted', () => {
+            resolve(users);
+        });
+        connection.execSql(request);
+    });
+}
+module.exports.getAllUsers = getAllUsers;
+
+
+function deleteUser(id){
+    return new Promise((resolve, reject) => {
+        const sql = 'DELETE FROM [tinderUsers].[users] WHERE id = @id'
+        const request = new Request(sql, (err, rowcount) => {
+            if (err){
+                reject(err);
+                console.log(err);
+            } else if (rowcount == 0) {
+                resolve(null);
+            }
+        });
+        request.addParameter('id', TYPES.VarChar, id);
+        
+        request.on('done', (columns) => {
+
+            var rowObject = {};
+                columns.forEach(function(column) {
+                    rowObject[column.metadata.colName] = column.value;
+                });
+
+                const user = User.fromDB(rowObject.id, rowObject.firstName, rowObject.lastName, rowObject.age, rowObject.gender, rowObject.email, rowObject.password);
+                resolve(user);
+        });
+        connection.execSql(request);
+    });
+}
+
+module.exports.deleteUser = deleteUser;

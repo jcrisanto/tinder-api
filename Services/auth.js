@@ -1,4 +1,6 @@
 const {sign, verify} = require("jsonwebtoken");
+const DB = require('../Azure DB/DB');
+
 
 exports.generateToken = payload => sign(payload, 'm-a-r-c-u-s-0-0');
 
