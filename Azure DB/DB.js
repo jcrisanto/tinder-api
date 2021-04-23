@@ -157,9 +157,7 @@ function deleteUser(id){
         });
         request.addParameter('id', TYPES.VarChar, id);
         
-        request.on('done', function(rowCount) {
-                console.log(rowCount + ' rows returned');
-
+        request.on('requestCompleted', function() {
                 resolve(true);
         });
         connection.execSql(request);
