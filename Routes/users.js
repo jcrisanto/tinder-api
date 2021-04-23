@@ -71,14 +71,13 @@ router.get("/info", async (req, res) => {
 });
 
 router.delete("/", async (req, res) => {
-    const foundUser = await DB.selectUserById(req.userId);
-    if(!foundUser) {
-        res.status(401).send({error: 'Unauthorized'});
+    const userWasDeleted = await DB.deleteUser(req.userId);
+    if(!userWasDeleted) {
+        res.status(400).send({error: 'User not deleted'});
         return;
     } else {
-    usersTable.splice(foundUser, 1);
-    saveChanges();
     res.status(200).send("User was deleted");
+    return;
     }
 });
 

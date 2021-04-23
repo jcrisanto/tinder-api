@@ -25,12 +25,13 @@ startDb();
 function selectUserById(id){
     return new Promise((resolve, reject) => {
         const sql = 'SELECT * FROM [tinderUsers].[users] WHERE id = @id'
+        let user = null;
         const request = new Request(sql, (err, rowcount) => {
             if (err){
                 reject(err);
                 console.log(err);
             } else if (rowcount == 0) {
-                resolve(null);
+                resolve(user);
             }
         });
         request.addParameter('id', TYPES.VarChar, id);
@@ -42,9 +43,13 @@ function selectUserById(id){
                     rowObject[column.metadata.colName] = column.value;
                 });
 
-                const user = User.fromDB(rowObject.id, rowObject.firstName, rowObject.lastName, rowObject.age, rowObject.gender, rowObject.email, rowObject.password);
-                resolve(user);
+                user = User.fromDB(rowObject.id, rowObject.firstName, rowObject.lastName, rowObject.age, rowObject.gender, rowObject.email, rowObject.password);
         });
+
+        request.on('requestCompleted', () => {
+            resolve(user);
+        });
+
         connection.execSql(request);
     });
 }
@@ -147,7 +152,7 @@ function deleteUser(id){
                 reject(err);
                 console.log(err);
             } else if (rowcount == 0) {
-                resolve(null);
+                resolve(false);
             }
         });
         request.addParameter('id', TYPES.VarChar, id);
@@ -155,8 +160,7 @@ function deleteUser(id){
         request.on('done', function(rowCount) {
                 console.log(rowCount + ' rows returned');
 
-                const user = User.fromDB(rowObject.id, rowObject.firstName, rowObject.lastName, rowObject.age, rowObject.gender, rowObject.email, rowObject.password);
-                resolve(user);
+                resolve(true);
         });
         connection.execSql(request);
     });
