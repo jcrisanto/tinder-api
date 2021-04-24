@@ -165,3 +165,28 @@ function deleteUser(id){
 }
 
 module.exports.deleteUser = deleteUser;
+
+function updateUser(user){
+    return new Promise((resolve, reject) => {
+        const sql = 'UPDATE [tinderUsers].[users] SET firstName = @firstName, lastName = @lastName, age = @age, gender = @gender, email = @email, password = @password WHERE id = @id'
+        const request = new Request(sql, (err) => {
+            if (err){
+                reject(err)
+                console.log(err)
+            }
+        });
+        request.addParameter('id', TYPES.VarChar, user.id)
+        request.addParameter('firstName', TYPES.VarChar, user.firstName)
+        request.addParameter('lastName', TYPES.VarChar, user.lastName)
+        request.addParameter('age', TYPES.Int, user.age)
+        request.addParameter('gender', TYPES.VarChar, user.gender)
+        request.addParameter('email', TYPES.VarChar, user.email)
+        request.addParameter('password', TYPES.Text, user.password)
+
+        request.on('requestCompleted', () => {
+            resolve('User inserted');
+        });
+        connection.execSql(request);
+    });
+}
+module.exports.updateUser = updateUser;

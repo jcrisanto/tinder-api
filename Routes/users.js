@@ -76,28 +76,25 @@ router.delete("/", async (req, res) => {
         res.status(400).send({error: 'User not deleted'});
         return;
     } else {
-    res.status(200).send("User was deleted");
-    return;
+        res.status(200).send("User was deleted");
+        return;
     }
 });
 
-router.put("/", function (req, res) {
+router.put("/", async (req, res) => {
     const userFromRequest = req.body;
-    let foundIndex = usersTable.findIndex((u) => u.id === req.userId);
-    let anotherUserWithSameEmail = usersTable.find((u) => u.id !== req.userId && u.email === userFromRequest.email);
-    if(anotherUserWithSameEmail) {
+    const foundUserWithId = await DB.selectUserById(req.userId);
+    if(!foundUserWithId) {
+        res.status(401).send({error: 'Unauthorized'});
+        return;
+    }
+    const foundUserWithEmail = await DB.selectUserByEmail(userFromRequest.email);
+    if(foundUserWithEmail && foundUserWithEmail.id !== req.userId) {
         res.status(400).send('Email already taken, please use another email');
         return;
     }
-    if (foundIndex !== -1) {
-        userFromRequest.id = req.userId;
-        userFromRequest.password = usersTable[foundIndex].password;
-     usersTable[foundIndex] = userFromRequest;
-        saveChanges();
-        res.status(200).send("User was updated");
-        return;
-    }
-    res.status(400).send("User was not found");
+    await DB.updateUser(userFromRequest);
+    res.status(200).send('User was updated');
 });
 
 router.get("/random", (req, res) => {
