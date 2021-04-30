@@ -1,104 +1,88 @@
 const express = require('express');
 const router = express.Router();
-const match = require('./../Models/match');
-const fs = require('fs');
+const Match = require('./../Models/match');
+const DB = require('../Azure DB/DB');
 
-let matchRequests = [];
-let matches = [];
-loadChanges();
-
-router.put('/send-like', (req, res) => {
+router.put('/send-like', async (req, res) => {
     const sendingLikeId = req.userId;
-    const recievingLikeId = req.body.likedId;
+    const receivingLikeId = req.body.likedId;
 
-    const foundMatch = matches.find((m) => m.exists(sendingLikeId, recievingLikeId));
+    const matchRequest = new Match(sendingLikeId, receivingLikeId);
+
+    const foundMatch = await DB.selectMatchById(matchRequest.id);
     if(foundMatch) {
-        res.status(204).send();
-        return;
-    }
-
-    const isMatchIndex = matchRequests.findIndex((m) => m.isMatch(sendingLikeId, recievingLikeId));
-    if (isMatchIndex === -1) {
-        const foundMatchRequest = matchRequests.find((m) => m.exists(sendingLikeId, recievingLikeId));
-        if(foundMatchRequest) {
-            res.status(204).send();
+        if(foundMatch.receivingLikeId === sendingLikeId && !foundMatch.isApproved){
+            foundMatch.isApproved = true;
+            await DB.approveMatch(foundMatch);
+            res.status(200).send('isMatch');
             return;
         }
-        matchRequests.push(new match(sendingLikeId, recievingLikeId));
-        saveChanges();
         res.status(204).send();
         return;
     }
-    matchRequests.splice(isMatchIndex, 1);
-    matches.push(new match(recievingLikeId, sendingLikeId));
-    saveChanges();
-    res.status(200).send('isMatch');
+    await DB.insertMatch(matchRequest);
+    res.status(204).send();
 });
 
-router.put('/send-dislike', (req, res) => {
+router.put('/send-dislike', async (req, res) => {
     const sendingLikeId = req.userId;
-    const recievingLikeId = req.body.likedId;
+    const receivingLikeId = req.body.likedId;
 
-    const isMatchIndex = matchRequests.findIndex((m) => m.exists(sendingLikeId, recievingLikeId));
-    if(isMatchIndex !== -1) {
-        matchRequests.splice(isMatchIndex, 1);
-        saveChanges();
-        res.status(200).send();
-        return;
-    }
-
-    const matchExists = matches.findIndex((m) => m.exists(sendingLikeId, recievingLikeId));
-    if (matchExists !== -1) {
-        matches.splice(isMatchIndex, 1);
-        saveChanges();
-        res.status(200).send();
-        return;
+    const matchRequest = new Match(sendingLikeId, receivingLikeId);
+    const foundMatch = await DB.selectMatchById(matchRequest.id);
+    if(foundMatch) {
+        await DB.deleteMatch(foundMatch.id);
     }
     res.status(200).send();
 });
 
-router.get('/', (req, res) => {
-    const userId = req.userId;
-    const foundMatches = matches.filter(m => m.userHasMatch(userId));
-    const userIdsFromMatches = foundMatches.map(m => userId === m.sendingLikeId ? m.recievingLikeId : m.sendingLikeId);
-    const fileExists = fs.existsSync("Database/users-table.json");
-    const usersFromDb = fileExists ? [...JSON.parse(fs.readFileSync("Database/users-table.json").toString())] : [];
-    const usersMatched = usersFromDb.filter(u => userIdsFromMatches.includes(u.id));
-    res.status(200).send(usersMatched.map(mapUserDto));
-    /* This is a the real syntax, and the one above is a shorter version
-    res.status(200).send(usersMatched.map((m) => mapUserDto(m)));
-    */
+router.get('/mine', async (req, res) => {
+    let foundMatches = (await DB.findMatchesByUserId(req.userId)).filter(x => x.isApproved);
+    const usersIdsFromMatches = foundMatches.map(m => req.userId === m.sendingLikeId ? m.receivingLikeId : m.sendingLikeId)
+
+    const usersFromDb = await DB.getAllUsers();
+    const userDtos = usersFromDb.filter(u => usersIdsFromMatches.includes(u.id))
+    userDtos.forEach((u) => delete u.password);
+
+    res.status(200).send(userDtos);
 });
 
-function saveChanges() {
-    const fileExists = fs.existsSync("Database");
-    if(!fileExists) {
-        fs.mkdirSync('Database')
-    }
-    fs.writeFile("Database/match-requests-table.json", JSON.stringify(matchRequests, null, 2), (err) => { console.log(err) });
-    fs.writeFile("Database/matches-table.json", JSON.stringify(matches, null, 2), (err) => { console.log(err) });
-}
-
-function loadChanges() {
-    const matchRequestsFileExists = fs.existsSync("Database/match-requests-table.json");
-    if(!matchRequestsFileExists) {
-        matchRequests = [];
+router.get('/', async (req, res) => {
+    const foundUser = await DB.selectUserById(req.userId);
+    if(!foundUser || !foundUser.isAdmin) {
+        res.status(401).send({error: 'Unauthorized'});
         return;
     }
-    const matchRequestsData = fs.readFileSync("Database/match-requests-table.json");
-    matchRequests = [...JSON.parse(matchRequestsData.toString())].map(mapMatch);
+    const matches = await DB.getAllMatches();
+    res.status(200).send(matches);
+});
 
-    const matchFileExists = fs.existsSync("Database/matches-table.json");
-    if(!matchFileExists) {
-        matches = [];
-        return;
-    }
-    const matchesData = fs.readFileSync("Database/matches-table.json");
-    matches = [...JSON.parse(matchesData.toString())].map(mapMatch);
+function getAllMatches(){
+    return new Promise((resolve, reject) => {
+        const sql = 'SELECT * FROM matches'
+        const request = new Request(sql, (err, rowcount) => {
+            if (err){
+                reject(err);
+                console.log(err);
+            } else if (rowcount == 0) {
+                resolve([]);
+            }
+        });
+        const matches = [];
+        request.on('row', (columns) => {
+            var rowObject = {};
+            columns.forEach(function(column) {
+                rowObject[column.metadata.colName] = column.value;
+            });
+            const match = Match.fromDB(rowObject.id, rowObject.sendingLikeId, rowObject.receivingLikeId, rowObject.isApproved);
+            matches.push(match);
+        });
+        request.on('requestCompleted', () => {
+            resolve(matches);
+        });
+        connection.execSql(request);
+    });
 }
-
-function mapMatch({sendingLikeId, recievingLikeId}) {return new match(sendingLikeId, recievingLikeId)}
-function mapUserDto({id, firstName, lastName, age, email}) {return {id, firstName, lastName, age, email}}
-
+module.exports.getAllMatches = getAllMatches;
 
 module.exports = router;

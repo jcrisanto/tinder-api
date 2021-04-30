@@ -1,16 +1,19 @@
-class match {
-    constructor(sendingLikeId, recievingLikeId) {
+class Match {
+    constructor(sendingLikeId, receivingLikeId) {
+        const users = [sendingLikeId, receivingLikeId];
+        users.sort();
+        this.id = users.join('');
         this.sendingLikeId = sendingLikeId;
-        this.recievingLikeId = recievingLikeId;
+        this.receivingLikeId = receivingLikeId;
+        this.isApproved = false;
     }
 
-    isMatch = (recievingLikeId, sendingLikeId) => this.sendingLikeId === sendingLikeId && this.recievingLikeId === recievingLikeId;
-
-    userHasMatch = (sendingLikeId) => this.sendingLikeId === sendingLikeId || this.recievingLikeId === sendingLikeId;
-
-    exists = (sendingLikeId, recievingLikeId) =>
-        (this.sendingLikeId === sendingLikeId && this.recievingLikeId === recievingLikeId) ||
-        (this.sendingLikeId === recievingLikeId && this.recievingLikeId === sendingLikeId);
+    static fromDB(id, sendingLikeId, receivingLikeId, isApproved) {
+        let match = new Match(sendingLikeId, receivingLikeId);
+        match.id = id;
+        match.isApproved = isApproved;
+        return match;
+    }
 }
 
-module.exports = match;
+module.exports = Match;
