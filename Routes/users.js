@@ -29,24 +29,9 @@ router.get('/login', async (req, res) => {
     res.status(200).send(token);
 });
 
-router.get("/", async (req, res) => {
-    const foundUser = await DB.selectUserById(req.userId);
-    if(!foundUser || !foundUser.isAdmin) {
-        res.status(401).send({error: 'Unauthorized'});
-        return;
-    }
-    const usersDTO = await DB.getAllUsers();
-    usersDTO.forEach((u) => delete u.password);
-    const response = {count: usersDTO.length, items: usersDTO};
-    res.status(200).send(response);
-});
 
 router.get("/info", async (req, res) => {
     const foundUser = await DB.selectUserById(req.userId);
-    if(!foundUser) {
-        res.status(401).send({error: 'Unauthorized'});
-        return;
-    }
     delete foundUser.password;
     res.status(200).send(foundUser);
 });
@@ -62,8 +47,7 @@ router.delete("/", async (req, res) => {
 
 router.put("/", async (req, res) => {
     const currentUser = User.fromObject(req.body);
-    const foundUserWithId = await DB.selectUserById(req.userId);
-    if(currentUser.id !== req.userId || !foundUserWithId) {
+    if(currentUser.id !== req.userId) {
         res.status(401).send({error: 'Unauthorized'});
         return;
     }
@@ -77,11 +61,6 @@ router.put("/", async (req, res) => {
 });
 
 router.get("/random", async (req, res) => {
-    const foundUser = await DB.selectUserById(req.userId);
-    if(!foundUser) {
-        res.status(401).send({error: 'Unauthorized'});
-        return;
-    }
     const allUsers = await DB.getAllUsers();
     const userDTO = getRandomUser(req.userId, allUsers);
     if(!userDTO) {
@@ -100,6 +79,7 @@ const getRandomUser = (reqUserId, users) => {
     delete userDTO.password;
     return userDTO;
 };
+
 
 const userRouter = router;
 module.exports = {getRandomUser, userRouter};

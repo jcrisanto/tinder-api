@@ -313,3 +313,32 @@ function findMatchesByUserId(id){
     });
 }
 module.exports.findMatchesByUserId = findMatchesByUserId;
+
+function getAllMatches(){
+    return new Promise((resolve, reject) => {
+        const sql = 'SELECT * FROM [tinderUsers].[matches]'
+        const request = new Request(sql, (err, rowcount) => {
+            if (err){
+                reject(err);
+                console.log(err);
+            } else if (rowcount == 0) {
+                resolve([]);
+            }
+        });
+        const matches = [];
+        request.on('row', (columns) => {
+            var rowObject = {};
+            columns.forEach(function(column) {
+                rowObject[column.metadata.colName] = column.value;
+            });
+            const match = Match.fromDB(rowObject.id, rowObject.sendingLikeId, rowObject.receivingLikeId, rowObject.isApproved);
+            matches.push(match);
+        });
+        request.on('requestCompleted', () => {
+            resolve(matches);
+        });
+        connection.execSql(request);
+    });
+}
+
+module.exports.getAllMatches = getAllMatches;

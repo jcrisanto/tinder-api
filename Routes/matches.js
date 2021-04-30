@@ -36,7 +36,7 @@ router.put('/send-dislike', async (req, res) => {
     res.status(200).send();
 });
 
-router.get('/mine', async (req, res) => {
+router.get('/', async (req, res) => {
     let foundMatches = (await DB.findMatchesByUserId(req.userId)).filter(x => x.isApproved);
     const usersIdsFromMatches = foundMatches.map(m => req.userId === m.sendingLikeId ? m.receivingLikeId : m.sendingLikeId)
 
@@ -46,43 +46,5 @@ router.get('/mine', async (req, res) => {
 
     res.status(200).send(userDtos);
 });
-
-router.get('/', async (req, res) => {
-    const foundUser = await DB.selectUserById(req.userId);
-    if(!foundUser || !foundUser.isAdmin) {
-        res.status(401).send({error: 'Unauthorized'});
-        return;
-    }
-    const matches = await DB.getAllMatches();
-    res.status(200).send(matches);
-});
-
-function getAllMatches(){
-    return new Promise((resolve, reject) => {
-        const sql = 'SELECT * FROM matches'
-        const request = new Request(sql, (err, rowcount) => {
-            if (err){
-                reject(err);
-                console.log(err);
-            } else if (rowcount == 0) {
-                resolve([]);
-            }
-        });
-        const matches = [];
-        request.on('row', (columns) => {
-            var rowObject = {};
-            columns.forEach(function(column) {
-                rowObject[column.metadata.colName] = column.value;
-            });
-            const match = Match.fromDB(rowObject.id, rowObject.sendingLikeId, rowObject.receivingLikeId, rowObject.isApproved);
-            matches.push(match);
-        });
-        request.on('requestCompleted', () => {
-            resolve(matches);
-        });
-        connection.execSql(request);
-    });
-}
-module.exports.getAllMatches = getAllMatches;
 
 module.exports = router;
