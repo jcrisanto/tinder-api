@@ -44,7 +44,7 @@ function selectUserById(id){
                 rowObject[column.metadata.colName] = column.value;
             });
 
-            user = User.fromDB(rowObject.id, rowObject.firstName, rowObject.lastName, rowObject.age, rowObject.gender, rowObject.email, rowObject.password, rowObject.isAdmin);
+            user = User.fromDB(rowObject.id, rowObject.firstName, rowObject.lastName, rowObject.age, rowObject.gender, rowObject.email, rowObject.password, rowObject.isAdmin, rowObject.height, rowObject.city, rowObject.favouriteAnimal, rowObject.favouriteColour, rowObject.musicGenre, rowObject.genderLimit, rowObject.ageLimit);
         });
 
         request.on('requestCompleted', () => {
@@ -77,7 +77,7 @@ function selectUserByEmail(email){
                 rowObject[column.metadata.colName] = column.value;
             });
 
-            user = User.fromDB(rowObject.id, rowObject.firstName, rowObject.lastName, rowObject.age, rowObject.gender, rowObject.email, rowObject.password, rowObject.isAdmin);
+            user = User.fromDB(rowObject.id, rowObject.firstName, rowObject.lastName, rowObject.age, rowObject.gender, rowObject.email, rowObject.password, rowObject.isAdmin, rowObject.height, rowObject.city, rowObject.favouriteAnimal, rowObject.favouriteColour, rowObject.musicGenre, rowObject.genderLimit, rowObject.ageLimit);
         });
 
         request.on('requestCompleted', () => {
@@ -90,21 +90,29 @@ exports.selectUserByEmail = selectUserByEmail;
 
 function insertUser(user){
     return new Promise((resolve, reject) => {
-        const sql = 'INSERT INTO [tinderUsers].[users] (id, firstName, lastName, age, gender, email, password, isAdmin) VALUES (@id, @firstName, @lastName, @age, @gender, @email, @password, @isAdmin)'
+        const sql = 'INSERT INTO [tinderUsers].[users] (id, firstName, lastName, age, gender, email, password, isAdmin, height, city, favouriteAnimal, favouriteColour, musicGenre, genderLimit, ageLimit) VALUES (@id, @firstName, @lastName, @age, @gender, @email, @password, @isAdmin, @height, @city, @favouriteAnimal, @favouriteColour, @musicGenre, @genderLimit, @ageLimit)'
         const request = new Request(sql, (err) => {
             if (err){
                 reject(err)
-                console.log(err)
+                console.log(err);
             }
         });
-        request.addParameter('id', TYPES.VarChar, user.id)
-        request.addParameter('firstName', TYPES.VarChar, user.firstName)
-        request.addParameter('lastName', TYPES.VarChar, user.lastName)
-        request.addParameter('age', TYPES.Int, user.age)
-        request.addParameter('gender', TYPES.VarChar, user.gender)
-        request.addParameter('email', TYPES.VarChar, user.email)
-        request.addParameter('password', TYPES.Text, user.password)
-        request.addParameter('isAdmin', TYPES.Bit, user.isAdmin)
+        request.addParameter('id', TYPES.VarChar, user.id);
+        request.addParameter('firstName', TYPES.VarChar, user.firstName);
+        request.addParameter('lastName', TYPES.VarChar, user.lastName);
+        request.addParameter('age', TYPES.Int, user.age);
+        request.addParameter('gender', TYPES.VarChar, user.gender);
+        request.addParameter('email', TYPES.VarChar, user.email);
+        request.addParameter('password', TYPES.Text, user.password);
+        request.addParameter('isAdmin', TYPES.Bit, user.isAdmin);
+        request.addParameter('height', TYPES.Int, user.height);
+        request.addParameter('city', TYPES.VarChar, user.city);
+        request.addParameter('favouriteAnimal', TYPES.VarChar, user.favouriteAnimal);
+        request.addParameter('favouriteColour', TYPES.VarChar, user.favouriteColour);
+        request.addParameter('musicGenre', TYPES.VarChar, user.musicGenre);
+        request.addParameter('genderLimit', TYPES.Text, user.genderLimit.join(','));
+        request.addParameter('ageLimit', TYPES.Text, user.ageLimit.join(','));
+
 
         request.on('requestCompleted', () => {
             resolve('User inserted');
@@ -132,7 +140,7 @@ function getAllUsers(){
                 rowObject[column.metadata.colName] = column.value;
             });
 
-            const user = User.fromDB(rowObject.id, rowObject.firstName, rowObject.lastName, rowObject.age, rowObject.gender, rowObject.email, rowObject.password, rowObject.isAdmin);
+            const user = User.fromDB(rowObject.id, rowObject.firstName, rowObject.lastName, rowObject.age, rowObject.gender, rowObject.email, rowObject.password, rowObject.isAdmin, rowObject.height, rowObject.city, rowObject.favouriteAnimal, rowObject.favouriteColour, rowObject.musicGenre, rowObject.genderLimit, rowObject.ageLimit);
             users.push(user);
         });
         request.on('requestCompleted', () => {

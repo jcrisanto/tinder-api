@@ -3,7 +3,7 @@ const { nanoid } = require("nanoid");
 //bcrypt is a library for encrypting plain text, it's used to hash passwords
 const bcrypt = require('bcrypt');
 class User {
-    constructor (firstName, lastName, age, gender, email, password) {
+    constructor (firstName, lastName, age, gender, email, password, height, city, favouriteAnimal, favouriteColour, musicGenre, genderLimit, ageLimit) {
         this.id = nanoid();
         this.firstName = firstName;
         this.lastName = lastName;
@@ -12,6 +12,13 @@ class User {
         this.email = email;
         this.password = bcrypt.hashSync(password, 5);
         this.isAdmin = false;
+        this.height = height;
+        this.city = city;
+        this.favouriteAnimal = favouriteAnimal;
+        this.favouriteColour = favouriteColour;
+        this.musicGenre = musicGenre;
+        this.genderLimit = genderLimit;
+        this.ageLimit = ageLimit;
     }
 
     passwordIsCorrect(password){
@@ -25,11 +32,18 @@ class User {
         let gender = req.body.gender;
         let email = req.body.email;
         let password = req.body.password;
-        return new User(firstName, lastName, age, gender, email, password);
+        let height = req.body.height;
+        let city = req.body.city;
+        let favouriteAnimal = req.body.favouriteAnimal;
+        let favouriteColour = req.body.favouriteColour;
+        let musicGenre = req.body.musicGenre;
+        let genderLimit = req.body.genderLimit;
+        let ageLimit = req.body.ageLimit;
+        return new User(firstName, lastName, age, gender, email, password, height, city, favouriteAnimal, favouriteColour, musicGenre, genderLimit, ageLimit);
     }
 
-    static fromDB(id, firstName, lastName, age, gender, email, password, isAdmin) {
-        let user = new User(firstName, lastName, age, gender, email, password);
+    static fromDB(id, firstName, lastName, age, gender, email, password, isAdmin, height, city, favouriteAnimal, favouriteColour, musicGenre, genderLimit, ageLimit) {
+        let user = new User(firstName, lastName, age, gender, email, password, height, city, favouriteAnimal, favouriteColour, musicGenre, genderLimit.split(','), ageLimit.split(','));
         user.id = id;
         user.password = password;
         user.isAdmin = isAdmin;
@@ -37,7 +51,7 @@ class User {
     }
 
     static fromObject(object) {
-        let user = new User(object.firstName, object.lastName, object.age, object.gender, object.email, object.password);
+        let user = new User(object.firstName, object.lastName, object.age, object.gender, object.email, object.password, object.height, object.city, object.favouriteAnimal, object.favouriteColour, object.musicGenre, object.genderLimit, object.ageLimit);
         user.id = object.id;
         return user;
     }
