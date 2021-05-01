@@ -174,20 +174,28 @@ module.exports.deleteUser = deleteUser;
 
 function updateUser(user){
     return new Promise((resolve, reject) => {
-        const sql = 'UPDATE [tinderUsers].[users] SET firstName = @firstName, lastName = @lastName, age = @age, gender = @gender, email = @email, password = @password WHERE id = @id'
+        const sql = 'UPDATE [tinderUsers].[users] SET firstName = @firstName, lastName = @lastName, age = @age, gender = @gender, email = @email, password = @password, height = @height, city = @city, favouriteAnimal = @favouriteAnimal, favouriteColour = @favouriteColour, musicGenre = @musicGenre, genderLimit = @genderLimit, ageLimit = @ageLimit WHERE id = @id'
         const request = new Request(sql, (err) => {
             if (err){
                 reject(err)
                 console.log(err)
             }
         });
-        request.addParameter('id', TYPES.VarChar, user.id)
-        request.addParameter('firstName', TYPES.VarChar, user.firstName)
-        request.addParameter('lastName', TYPES.VarChar, user.lastName)
-        request.addParameter('age', TYPES.Int, user.age)
-        request.addParameter('gender', TYPES.VarChar, user.gender)
-        request.addParameter('email', TYPES.VarChar, user.email)
-        request.addParameter('password', TYPES.Text, user.password)
+        request.addParameter('id', TYPES.VarChar, user.id);
+        request.addParameter('firstName', TYPES.VarChar, user.firstName);
+        request.addParameter('lastName', TYPES.VarChar, user.lastName);
+        request.addParameter('age', TYPES.Int, user.age);
+        request.addParameter('gender', TYPES.VarChar, user.gender);
+        request.addParameter('email', TYPES.VarChar, user.email);
+        request.addParameter('password', TYPES.Text, user.password);
+        request.addParameter('isAdmin', TYPES.Bit, user.isAdmin);
+        request.addParameter('height', TYPES.Int, user.height);
+        request.addParameter('city', TYPES.VarChar, user.city);
+        request.addParameter('favouriteAnimal', TYPES.VarChar, user.favouriteAnimal);
+        request.addParameter('favouriteColour', TYPES.VarChar, user.favouriteColour);
+        request.addParameter('musicGenre', TYPES.VarChar, user.musicGenre);
+        request.addParameter('genderLimit', TYPES.Text, user.genderLimit.join(','));
+        request.addParameter('ageLimit', TYPES.Text, user.ageLimit.join(','));
 
         request.on('requestCompleted', () => {
             resolve('User inserted');
