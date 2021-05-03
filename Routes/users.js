@@ -4,11 +4,11 @@ const User = require("../Models/user.js");
 const auth = require('../Services/auth');
 const DB = require('../Azure DB/DB');
 
-router.post('/register', async (req,res) => {
+router.post('/register', async (req, res) => {
     let newUser = User.fromRequest(req);
     const foundUser = await DB.selectUserByEmail(newUser.email);
 
-    if  (foundUser) {
+    if (foundUser) {
         res.status(400).send("Email already in use, try with a different email");
         return;
     }
@@ -38,7 +38,7 @@ router.get("/info", async (req, res) => {
 
 router.delete("/", async (req, res) => {
     const userWasDeleted = await DB.deleteUser(req.userId);
-    if(!userWasDeleted) {
+    if (!userWasDeleted) {
         res.status(400).send({error: 'User not deleted'});
         return;
     }
@@ -47,12 +47,12 @@ router.delete("/", async (req, res) => {
 
 router.put("/", async (req, res) => {
     const currentUser = User.fromObject(req.body);
-    if(currentUser.id !== req.userId) {
+    if (currentUser.id !== req.userId) {
         res.status(401).send({error: 'Unauthorized'});
         return;
     }
     const foundUserWithEmail = await DB.selectUserByEmail(currentUser.email);
-    if(foundUserWithEmail && foundUserWithEmail.id !== req.userId) {
+    if (foundUserWithEmail && foundUserWithEmail.id !== req.userId) {
         res.status(400).send('Email already taken, please use another email');
         return;
     }
@@ -63,7 +63,7 @@ router.put("/", async (req, res) => {
 router.get("/random", async (req, res) => {
     const allUsers = await DB.getAllUsers();
     const userDTO = getRandomUser(req.userId, allUsers);
-    if(!userDTO) {
+    if (!userDTO) {
         res.status(400).send("No match was found");
         return;
     }
@@ -78,12 +78,12 @@ const getRandomUser = (reqUserId, users) => {
         .filter(u => u.city === myUser.city)
         .filter(u => myUser.genderLimits.includes(u.gender))
         .filter(u => isInRange(u.age, myUser.ageLimits))
-        .filter(u => u.favouriteAnimals.some(x => myUser.favouriteAnimals.includes(x)))
-        .filter(u => u.favouriteColours.some(x => myUser.favouriteColours.includes(x)))
-        .filter(u => u.musicGenres.some(x => myUser.musicGenres.includes(x)));
+        .filter(u => u.favouriteAnimals.some(x => myUser.favouriteAnimals.includes(x))
+            || u.favouriteColours.some(x => myUser.favouriteColours.includes(x))
+            || u.musicGenres.some(x => myUser.musicGenres.includes(x)));
 
 
-    if(filteredUsers.length === 0) {
+    if (filteredUsers.length === 0) {
         return null;
     }
     const userDTO = filteredUsers[Math.floor(Math.random() * filteredUsers.length)];
@@ -92,7 +92,7 @@ const getRandomUser = (reqUserId, users) => {
 };
 
 const isInRange = (number, arr) => {
-    if(arr.length !== 2) throw new Error('array must have  a length of two');
+    if (arr.length !== 2) throw new Error('array must have  a length of two');
     return number >= arr[0] && number <= arr[1];
 }
 
