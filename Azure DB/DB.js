@@ -25,7 +25,7 @@ startDb();
 
 function selectUserById(id){
     return new Promise((resolve, reject) => {
-        const sql = 'SELECT * FROM [tinderUsers].[users] WHERE id = @id'
+        const sql = 'SELECT * FROM users WHERE id = @id'
         let user = null;
         const request = new Request(sql, (err, rowcount) => {
             if (err){
@@ -44,7 +44,7 @@ function selectUserById(id){
                 rowObject[column.metadata.colName] = column.value;
             });
 
-            user = User.fromDB(rowObject.id, rowObject.firstName, rowObject.lastName, rowObject.age, rowObject.gender, rowObject.email, rowObject.password, rowObject.isAdmin, rowObject.height, rowObject.city, rowObject.favouriteAnimal, rowObject.favouriteColour, rowObject.musicGenre, rowObject.genderLimit, rowObject.ageLimit);
+            user = User.fromDB(rowObject.id, rowObject.firstName, rowObject.lastName, rowObject.age, rowObject.gender, rowObject.email, rowObject.password, rowObject.isAdmin, rowObject.height, rowObject.city, rowObject.favouriteAnimals, rowObject.favouriteColours, rowObject.musicGenres, rowObject.genderLimits, rowObject.ageLimits);
         });
 
         request.on('requestCompleted', () => {
@@ -58,7 +58,7 @@ module.exports.selectUserById = selectUserById;
 
 function selectUserByEmail(email){
     return new Promise((resolve, reject) => {
-        const sql = 'SELECT * FROM [tinderUsers].[users] WHERE email = @email';
+        const sql = 'SELECT * FROM users WHERE email = @email';
         let user = null;
         const request = new Request(sql, (err, rowcount) => {
             if (err){
@@ -77,7 +77,7 @@ function selectUserByEmail(email){
                 rowObject[column.metadata.colName] = column.value;
             });
 
-            user = User.fromDB(rowObject.id, rowObject.firstName, rowObject.lastName, rowObject.age, rowObject.gender, rowObject.email, rowObject.password, rowObject.isAdmin, rowObject.height, rowObject.city, rowObject.favouriteAnimal, rowObject.favouriteColour, rowObject.musicGenre, rowObject.genderLimit, rowObject.ageLimit);
+            user = User.fromDB(rowObject.id, rowObject.firstName, rowObject.lastName, rowObject.age, rowObject.gender, rowObject.email, rowObject.password, rowObject.isAdmin, rowObject.height, rowObject.city, rowObject.favouriteAnimals, rowObject.favouriteColours, rowObject.musicGenres, rowObject.genderLimits, rowObject.ageLimits);
         });
 
         request.on('requestCompleted', () => {
@@ -90,7 +90,7 @@ exports.selectUserByEmail = selectUserByEmail;
 
 function insertUser(user){
     return new Promise((resolve, reject) => {
-        const sql = 'INSERT INTO [tinderUsers].[users] (id, firstName, lastName, age, gender, email, password, isAdmin, height, city, favouriteAnimal, favouriteColour, musicGenre, genderLimit, ageLimit) VALUES (@id, @firstName, @lastName, @age, @gender, @email, @password, @isAdmin, @height, @city, @favouriteAnimal, @favouriteColour, @musicGenre, @genderLimit, @ageLimit)'
+        const sql = 'INSERT INTO users (id, firstName, lastName, age, gender, email, password, isAdmin, height, city, favouriteAnimals, favouriteColours, musicGenres, genderLimits, ageLimits) VALUES (@id, @firstName, @lastName, @age, @gender, @email, @password, @isAdmin, @height, @city, @favouriteAnimals, @favouriteColours, @musicGenres, @genderLimits, @ageLimits)'
         const request = new Request(sql, (err) => {
             if (err){
                 reject(err)
@@ -103,15 +103,15 @@ function insertUser(user){
         request.addParameter('age', TYPES.Int, user.age);
         request.addParameter('gender', TYPES.VarChar, user.gender);
         request.addParameter('email', TYPES.VarChar, user.email);
-        request.addParameter('password', TYPES.Text, user.password);
+        request.addParameter('password', TYPES.VarChar, user.password);
         request.addParameter('isAdmin', TYPES.Bit, user.isAdmin);
         request.addParameter('height', TYPES.Int, user.height);
         request.addParameter('city', TYPES.VarChar, user.city);
-        request.addParameter('favouriteAnimal', TYPES.VarChar, user.favouriteAnimal);
-        request.addParameter('favouriteColour', TYPES.VarChar, user.favouriteColour);
-        request.addParameter('musicGenre', TYPES.VarChar, user.musicGenre);
-        request.addParameter('genderLimit', TYPES.Text, user.genderLimit.join(','));
-        request.addParameter('ageLimit', TYPES.Text, user.ageLimit.join(','));
+        request.addParameter('favouriteAnimals', TYPES.VarChar, user.favouriteAnimals.join(','));
+        request.addParameter('favouriteColours', TYPES.VarChar, user.favouriteColours.join(','));
+        request.addParameter('musicGenres', TYPES.VarChar, user.musicGenres.join(','));
+        request.addParameter('genderLimits', TYPES.VarChar, user.genderLimits.join(','));
+        request.addParameter('ageLimits', TYPES.VarChar, user.ageLimits.join(','));
 
 
         request.on('requestCompleted', () => {
@@ -124,7 +124,7 @@ module.exports.insertUser = insertUser;
 
 function getAllUsers(){
     return new Promise((resolve, reject) => {
-        const sql = 'SELECT * FROM [tinderUsers].[users]'
+        const sql = 'SELECT * FROM users'
         const request = new Request(sql, (err, rowcount) => {
             if (err){
                 reject(err);
@@ -140,7 +140,7 @@ function getAllUsers(){
                 rowObject[column.metadata.colName] = column.value;
             });
 
-            const user = User.fromDB(rowObject.id, rowObject.firstName, rowObject.lastName, rowObject.age, rowObject.gender, rowObject.email, rowObject.password, rowObject.isAdmin, rowObject.height, rowObject.city, rowObject.favouriteAnimal, rowObject.favouriteColour, rowObject.musicGenre, rowObject.genderLimit, rowObject.ageLimit);
+            const user = User.fromDB(rowObject.id, rowObject.firstName, rowObject.lastName, rowObject.age, rowObject.gender, rowObject.email, rowObject.password, rowObject.isAdmin, rowObject.height, rowObject.city, rowObject.favouriteAnimals, rowObject.favouriteColours, rowObject.musicGenres, rowObject.genderLimits, rowObject.ageLimits);
             users.push(user);
         });
         request.on('requestCompleted', () => {
@@ -153,7 +153,7 @@ module.exports.getAllUsers = getAllUsers;
 
 function deleteUser(id){
     return new Promise((resolve, reject) => {
-        const sql = 'DELETE FROM [tinderUsers].[users] WHERE id = @id'
+        const sql = 'DELETE FROM users WHERE id = @id'
         const request = new Request(sql, (err, rowcount) => {
             if (err){
                 reject(err);
@@ -174,7 +174,7 @@ module.exports.deleteUser = deleteUser;
 
 function updateUser(user){
     return new Promise((resolve, reject) => {
-        const sql = 'UPDATE [tinderUsers].[users] SET firstName = @firstName, lastName = @lastName, age = @age, gender = @gender, email = @email, password = @password, height = @height, city = @city, favouriteAnimal = @favouriteAnimal, favouriteColour = @favouriteColour, musicGenre = @musicGenre, genderLimit = @genderLimit, ageLimit = @ageLimit WHERE id = @id'
+        const sql = 'UPDATE users SET firstName = @firstName, lastName = @lastName, age = @age, gender = @gender, email = @email, password = @password, height = @height, city = @city, favouriteAnimals = @favouriteAnimals, favouriteColours = @favouriteColours, musicGenres = @musicGenres, genderLimits = @genderLimits, ageLimits = @ageLimits WHERE id = @id'
         const request = new Request(sql, (err) => {
             if (err){
                 reject(err)
@@ -187,15 +187,15 @@ function updateUser(user){
         request.addParameter('age', TYPES.Int, user.age);
         request.addParameter('gender', TYPES.VarChar, user.gender);
         request.addParameter('email', TYPES.VarChar, user.email);
-        request.addParameter('password', TYPES.Text, user.password);
+        request.addParameter('password', TYPES.VarChar, user.password);
         request.addParameter('isAdmin', TYPES.Bit, user.isAdmin);
         request.addParameter('height', TYPES.Int, user.height);
         request.addParameter('city', TYPES.VarChar, user.city);
-        request.addParameter('favouriteAnimal', TYPES.VarChar, user.favouriteAnimal);
-        request.addParameter('favouriteColour', TYPES.VarChar, user.favouriteColour);
-        request.addParameter('musicGenre', TYPES.VarChar, user.musicGenre);
-        request.addParameter('genderLimit', TYPES.Text, user.genderLimit.join(','));
-        request.addParameter('ageLimit', TYPES.Text, user.ageLimit.join(','));
+        request.addParameter('favouriteAnimals', TYPES.VarChar, user.favouriteAnimals.join(','));
+        request.addParameter('favouriteColours', TYPES.VarChar, user.favouriteColours.join(','));
+        request.addParameter('musicGenres', TYPES.VarChar, user.musicGenres.join(','));
+        request.addParameter('genderLimits', TYPES.VarChar, user.genderLimits.join(','));
+        request.addParameter('ageLimits', TYPES.VarChar, user.ageLimits.join(','));
 
         request.on('requestCompleted', () => {
             resolve('User inserted');
@@ -302,7 +302,7 @@ module.exports.deleteMatch = deleteMatch;
 
 function findMatchesByUserId(id){
     return new Promise((resolve, reject) => {
-        const sql = 'SELECT * FROM [tinderUsers].[matches] WHERE sendingLikeId = @id OR receivingLikeId = @id';
+        const sql = 'SELECT * FROM matches WHERE sendingLikeId = @id OR receivingLikeId = @id';
         let matches = [];
         const request = new Request(sql, (err, rowcount) => {
             if (err){
@@ -332,7 +332,7 @@ module.exports.findMatchesByUserId = findMatchesByUserId;
 
 function getAllMatches(){
     return new Promise((resolve, reject) => {
-        const sql = 'SELECT * FROM [tinderUsers].[matches]'
+        const sql = 'SELECT * FROM matches'
         const request = new Request(sql, (err, rowcount) => {
             if (err){
                 reject(err);

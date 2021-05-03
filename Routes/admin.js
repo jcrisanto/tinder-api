@@ -31,7 +31,7 @@ router.get("/users", async (req, res) => {
 router.put("/", async (req, res) => {
     const currentUser = User.fromObject(req.body);
     const foundUserWithEmail = await DB.selectUserByEmail(currentUser.email);
-    if(foundUserWithEmail && foundUserWithEmail.id !== req.userId) {
+    if(foundUserWithEmail && foundUserWithEmail.id !== currentUser.id) {
         res.status(400).send('Email already taken, please use another email');
         return;
     }

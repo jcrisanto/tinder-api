@@ -3,7 +3,7 @@ const { nanoid } = require("nanoid");
 //bcrypt is a library for encrypting plain text, it's used to hash passwords
 const bcrypt = require('bcrypt');
 class User {
-    constructor (firstName, lastName, age, gender, email, password, height, city, favouriteAnimal, favouriteColour, musicGenre, genderLimit, ageLimit) {
+    constructor (firstName, lastName, age, gender, email, password, height, city, favouriteAnimals, favouriteColours, musicGenres, genderLimits, ageLimits) {
         this.id = nanoid();
         this.firstName = firstName;
         this.lastName = lastName;
@@ -14,11 +14,11 @@ class User {
         this.isAdmin = false;
         this.height = height;
         this.city = city;
-        this.favouriteAnimal = favouriteAnimal;
-        this.favouriteColour = favouriteColour;
-        this.musicGenre = musicGenre;
-        this.genderLimit = genderLimit;
-        this.ageLimit = ageLimit;
+        this.favouriteAnimals = favouriteAnimals;
+        this.favouriteColours = favouriteColours;
+        this.musicGenres = musicGenres;
+        this.genderLimits = genderLimits;
+        this.ageLimits = ageLimits;
     }
 
     passwordIsCorrect(password){
@@ -34,16 +34,16 @@ class User {
         let password = req.body.password;
         let height = req.body.height;
         let city = req.body.city;
-        let favouriteAnimal = req.body.favouriteAnimal;
-        let favouriteColour = req.body.favouriteColour;
-        let musicGenre = req.body.musicGenre;
-        let genderLimit = req.body.genderLimit;
-        let ageLimit = req.body.ageLimit;
-        return new User(firstName, lastName, age, gender, email, password, height, city, favouriteAnimal, favouriteColour, musicGenre, genderLimit, ageLimit);
+        let favouriteAnimals = req.body.favouriteAnimals;
+        let favouriteColours = req.body.favouriteColours;
+        let musicGenres = req.body.musicGenres;
+        let genderLimits = req.body.genderLimits;
+        let ageLimits = req.body.ageLimits;
+        return new User(firstName, lastName, age, gender, email, password, height, city, favouriteAnimals, favouriteColours, musicGenres, genderLimits, ageLimits);
     }
 
-    static fromDB(id, firstName, lastName, age, gender, email, password, isAdmin, height, city, favouriteAnimal, favouriteColour, musicGenre, genderLimit, ageLimit) {
-        let user = new User(firstName, lastName, age, gender, email, password, height, city, favouriteAnimal, favouriteColour, musicGenre, genderLimit.split(','), ageLimit.split(','));
+    static fromDB(id, firstName, lastName, age, gender, email, password, isAdmin, height, city, favouriteAnimals, favouriteColours, musicGenres, genderLimits, ageLimits) {
+        let user = new User(firstName, lastName, age, gender, email, password, height, city, favouriteAnimals.split(','), favouriteColours.split(','), musicGenres.split(','), genderLimits.split(','), ageLimits.split(',').map(x => parseInt(x)));
         user.id = id;
         user.password = password;
         user.isAdmin = isAdmin;
@@ -51,7 +51,7 @@ class User {
     }
 
     static fromObject(object) {
-        let user = new User(object.firstName, object.lastName, object.age, object.gender, object.email, object.password, object.height, object.city, object.favouriteAnimal, object.favouriteColour, object.musicGenre, object.genderLimit, object.ageLimit);
+        let user = new User(object.firstName, object.lastName, object.age, object.gender, object.email, object.password, object.height, object.city, object.favouriteAnimals, object.favouriteColours, object.musicGenres, object.genderLimits, object.ageLimits);
         user.id = object.id;
         return user;
     }

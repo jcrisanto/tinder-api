@@ -71,14 +71,30 @@ router.get("/random", async (req, res) => {
 });
 
 const getRandomUser = (reqUserId, users) => {
-    const foundUsers = users.filter(u => u.id !== reqUserId);
-    if(foundUsers.length === 0) {
+    const myUser = users.find(u => u.id === reqUserId);
+
+    const filteredUsers = users
+        .filter(u => u.id !== myUser.id)
+        .filter(u => u.city === myUser.city)
+        .filter(u => myUser.genderLimits.includes(u.gender))
+        .filter(u => isInRange(u.age, myUser.ageLimits))
+        .filter(u => u.favouriteAnimals.some(x => myUser.favouriteAnimals.includes(x)))
+        .filter(u => u.favouriteColours.some(x => myUser.favouriteColours.includes(x)))
+        .filter(u => u.musicGenres.some(x => myUser.musicGenres.includes(x)));
+
+
+    if(filteredUsers.length === 0) {
         return null;
     }
-    const userDTO = foundUsers[Math.floor(Math.random() * foundUsers.length)];
+    const userDTO = filteredUsers[Math.floor(Math.random() * filteredUsers.length)];
     delete userDTO.password;
     return userDTO;
 };
+
+const isInRange = (number, arr) => {
+    if(arr.length !== 2) throw new Error('array must have  a length of two');
+    return number >= arr[0] && number <= arr[1];
+}
 
 
 const userRouter = router;

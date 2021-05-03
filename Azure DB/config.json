@@ -1,14 +1,14 @@
 {
-    "server": "datingappservercbs.database.windows.net",
+    "server": "localhost",
     "authentication": {
         "type": "default",
         "options": {
-            "userName": "marcussh",
-            "password": "Sangill2312"
+            "userName": "SA",
+            "password": "jcrisanto0@AA"
         }
     },
     "options": {
-        "encrypt": true,
-        "database": "MyDatingApp"
+        "encrypt": false,
+        "database": "master"
     }
 }
