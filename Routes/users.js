@@ -47,10 +47,10 @@ router.delete("/", async (req, res) => {
 
 router.put("/", async (req, res) => {
     const currentUser = User.fromObject(req.body);
-    if (currentUser.id !== req.userId) {
-        res.status(401).send({error: 'Unauthorized'});
-        return;
-    }
+    // if (currentUser.id !== req.userId) {
+    //     res.status(401).send({error: 'Unauthorized'});
+    //     return;
+    // }
     const foundUserWithEmail = await DB.selectUserByEmail(currentUser.email);
     if (foundUserWithEmail && foundUserWithEmail.id !== req.userId) {
         res.status(400).send('Email already taken, please use another email');
@@ -76,8 +76,8 @@ const getRandomUser = (reqUserId, users) => {
     const filteredUsers = users
         .filter(u => u.id !== myUser.id)
         .filter(u => u.city === myUser.city)
-        .filter(u => myUser.genderLimits.includes(u.gender))
-        .filter(u => isInRange(u.age, myUser.ageLimits))
+        .filter(u => myUser.genderLimits.includes(u.gender) && u.genderLimits.includes(myUser.gender))
+        .filter(u => isInRange(u.age, myUser.ageLimits) && isInRange(myUser.age, u.ageLimits))
         .filter(u => u.favouriteAnimals.some(x => myUser.favouriteAnimals.includes(x))
             || u.favouriteColours.some(x => myUser.favouriteColours.includes(x))
             || u.musicGenres.some(x => myUser.musicGenres.includes(x)));

@@ -174,7 +174,7 @@ module.exports.deleteUser = deleteUser;
 
 function updateUser(user){
     return new Promise((resolve, reject) => {
-        const sql = 'UPDATE users SET firstName = @firstName, lastName = @lastName, age = @age, gender = @gender, email = @email, password = @password, height = @height, city = @city, favouriteAnimals = @favouriteAnimals, favouriteColours = @favouriteColours, musicGenres = @musicGenres, genderLimits = @genderLimits, ageLimits = @ageLimits WHERE id = @id'
+        const sql = 'UPDATE users SET firstName = @firstName, lastName = @lastName, age = @age, gender = @gender, email = @email, height = @height, city = @city, favouriteAnimals = @favouriteAnimals, favouriteColours = @favouriteColours, musicGenres = @musicGenres, genderLimits = @genderLimits, ageLimits = @ageLimits WHERE id = @id'
         const request = new Request(sql, (err) => {
             if (err){
                 reject(err)
@@ -187,7 +187,7 @@ function updateUser(user){
         request.addParameter('age', TYPES.Int, user.age);
         request.addParameter('gender', TYPES.VarChar, user.gender);
         request.addParameter('email', TYPES.VarChar, user.email);
-        request.addParameter('password', TYPES.VarChar, user.password);
+        //request.addParameter('password', TYPES.VarChar, user.password);
         request.addParameter('isAdmin', TYPES.Bit, user.isAdmin);
         request.addParameter('height', TYPES.Int, user.height);
         request.addParameter('city', TYPES.VarChar, user.city);
@@ -207,7 +207,7 @@ module.exports.updateUser = updateUser;
 
 function insertMatch(match){
     return new Promise((resolve, reject) => {
-        const sql = 'INSERT INTO [tinderUsers].[matches] (id, sendingLikeId, receivingLikeId, isApproved) VALUES (@id, @sendingLikeId, @receivingLikeId, @isApproved)'
+        const sql = 'INSERT INTO matches (id, sendingLikeId, receivingLikeId, isApproved) VALUES (@id, @sendingLikeId, @receivingLikeId, @isApproved)'
         const request = new Request(sql, (err) => {
             if (err){
                 reject(err)
@@ -229,7 +229,7 @@ module.exports.insertMatch = insertMatch;
 
 function selectMatchById(id){
     return new Promise((resolve, reject) => {
-        const sql = 'SELECT * FROM [tinderUsers].[matches] WHERE id = @id'
+        const sql = 'SELECT * FROM matches WHERE id = @id'
         let match = null;
         const request = new Request(sql, (err, rowcount) => {
             if (err){
@@ -281,7 +281,7 @@ module.exports.approveMatch = approveMatch;
 
 function deleteMatch(id){
     return new Promise((resolve, reject) => {
-        const sql = 'DELETE FROM [tinderUsers].[matches] WHERE id = @id'
+        const sql = 'DELETE FROM matches WHERE id = @id'
         const request = new Request(sql, (err, rowcount) => {
             if (err){
                 reject(err);

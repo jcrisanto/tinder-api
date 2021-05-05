@@ -12,7 +12,7 @@ router.get('/matches', async (req, res) => {
 
 
 router.delete("/", async (req, res) => {
-    const userWasDeleted = await DB.deleteUser(req.body.id);
+    const userWasDeleted = await DB.deleteUser(req.query.id);
     if(!userWasDeleted) {
         res.status(400).send({error: 'User not deleted'});
         return;
@@ -26,6 +26,12 @@ router.get("/users", async (req, res) => {
     usersDTO.forEach((u) => delete u.password);
     const response = {count: usersDTO.length, items: usersDTO};
     res.status(200).send(response);
+});
+
+router.get("/users/:id", async (req, res) => {
+    const foundUser = await DB.selectUserById(req.params.id);
+    delete foundUser.password;
+    res.status(200).send(foundUser);
 });
 
 router.put("/", async (req, res) => {
